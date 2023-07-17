@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stm32l0xx_ll_gpio.h"
+#include "stm32h7xx_ll_gpio.h"
 
 class DigitalOut {
 public:

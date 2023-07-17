@@ -1,2 +1,2 @@
-Output/
-*.emSession
+build/
+CMakeLists.txt.user
