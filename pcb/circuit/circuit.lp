@@ -1,0 +1,18 @@
+(librepcb_circuit
+ (variant 62381a67-292d-448e-952b-bea07d640ac0 (name "Std")
+  (description "Standard assembly")
+ )
+ (netclass 6b4592ea-551e-4039-aa59-8b170c8528ca (name "default"))
+ (component 8483851e-d9b0-45b6-bc81-18329c3ab38a
+  (lib_component 98e71eaa-1b90-4a84-8529-ed4f493e5c41)
+  (lib_variant 352cccd5-0c3c-4c66-88e0-6ee7c6a3cbf9)
+  (name "FRAME1") (value "")
+  (lock_assembly false)
+  (attribute "FIELD_SHEET" (type string) (unit none) (value "{{ SCH_FRAME_SHEET or SHEET }}"))
+  (attribute "FIELD_PROJECT" (type string) (unit none) (value "{{ SCH_FRAME_PROJECT or PROJECT }}"))
+  (attribute "FIELD_VERSION" (type string) (unit none) (value "{{ SCH_FRAME_VERSION or VERSION }}"))
+  (attribute "FIELD_DATE" (type string) (unit none) (value "{{ SCH_FRAME_DATE or DATE }}"))
+  (attribute "FIELD_AUTHOR" (type string) (unit none) (value "{{ SCH_FRAME_AUTHOR or AUTHOR }}"))
+  (attribute "FIELD_PAGE" (type string) (unit none) (value "{{ SCH_FRAME_PAGE_X_OF_Y or PAGE_X_OF_Y }}"))
+ )
+)
