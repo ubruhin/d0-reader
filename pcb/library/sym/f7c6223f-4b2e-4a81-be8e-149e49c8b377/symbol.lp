@@ -1,9 +1,9 @@
 (librepcb_symbol f7c6223f-4b2e-4a81-be8e-149e49c8b377
- (name "Phototransistor")
+ (name "Phototransistor NPN")
  (description "")
- (keywords "")
+ (keywords "photo,light")
  (author "U. Bruhin")
- (version "0.1")
+ (version "0.1.1")
  (created 2023-07-08T18:02:48Z)
  (deprecated false)
  (generated_by "")
