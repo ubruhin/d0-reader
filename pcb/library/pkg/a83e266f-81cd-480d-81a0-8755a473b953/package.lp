@@ -11,10 +11,12 @@
  (assembly_type tht)
  (pad 30bf1512-b9e1-4af5-a138-aec8428976fc (name "1"))
  (pad 0ab29455-1890-4c7c-b72b-2035bee04f97 (name "2"))
+ (3d_model 262020d4-5d71-4d96-9fb6-203d17fdf23a (name "CUI_DEVICES_PJ-037A"))
  (footprint a815bfb4-8eb0-4192-b556-f87193f79766
   (name "default")
   (description "")
-  (3d_position 0.0 0.0 0.0) (3d_rotation 0.0 0.0 0.0)
+  (3d_position 7.0 0.0 0.0) (3d_rotation 90.0 0.0 90.0)
+  (3d_model 262020d4-5d71-4d96-9fb6-203d17fdf23a)
   (pad f93a8bc2-e0ab-4363-940c-1bd53b478e3c (side top) (shape roundrect)
    (position -6.8 0.0) (rotation 90.0) (size 4.1 2.0) (radius 1.0)
    (stop_mask auto) (solder_paste off) (clearance 0.0) (function standard)
@@ -73,8 +75,5 @@
    (align center top) (position 0.0 -5.08) (rotation 0.0)
    (auto_rotate true) (mirror false) (value "{{VALUE}}")
   )
- )
- (approved missing_footprint_3d_model
-  (footprint a815bfb4-8eb0-4192-b556-f87193f79766)
  )
 )
