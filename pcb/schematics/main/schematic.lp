@@ -1148,4 +1148,7 @@
    (position 254.0 162.56) (rotation 0.0) (mirror false)
   )
  )
+ (text a8df350f-6902-4416-89af-79717ba40ed3 (layer sch_comments) (value "TODO: Replace Q1 by a cheaper one.")
+  (align left bottom) (height 3.0) (position 7.62 60.96) (rotation 0.0)
+ )
 )

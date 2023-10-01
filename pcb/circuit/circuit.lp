@@ -479,7 +479,7 @@
   (lock_assembly false)
   (device ac086c99-62d6-4e33-8f86-b160289255d1
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
-   (part "BAT60AE6327HTSA1" (manufacturer "infineon")
+   (part "CUS15S30,H3F" (manufacturer "Toshiba")
    )
   )
   (signal 69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4))
@@ -755,7 +755,7 @@
   (lock_assembly false)
   (device ac086c99-62d6-4e33-8f86-b160289255d1
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
-   (part "BAT60AE6327HTSA1" (manufacturer "infineon")
+   (part "CUS15S30,H3F" (manufacturer "Toshiba")
    )
   )
   (signal 69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff (net 7fc7a615-490f-4931-9ce3-887c0a71bc0f))
@@ -991,7 +991,7 @@
   (lock_assembly false)
   (device bd748b8d-b627-4f45-b9f0-be5dca6ef5bf
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
-   (part "LMR16006YQ3" (manufacturer "Texas Instruments")
+   (part "LMR16006YQ3DDCRQ1" (manufacturer "Texas Instruments")
    )
   )
   (signal 06a34204-a2ff-404e-a814-ea1c74acb87b (net 30efe070-db96-4517-877f-78fd6a90c87f))
