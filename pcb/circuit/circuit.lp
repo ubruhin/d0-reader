@@ -1100,7 +1100,7 @@
   (name "C27") (value "{{CAPACITANCE}}")
   (lock_assembly false)
   (attribute "CAPACITANCE" (type capacitance) (unit microfarad) (value "10"))
-  (device c139e505-592b-46ba-bdf2-acb7383ea0cd
+  (device e80a2ba5-13dd-41f2-9cdc-f29e30a9e2ed
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
   )
   (signal 1c1c7abc-7b40-4f92-b533-f65604644db7 (net d6084e3e-947d-43a5-ae0d-103b2dab57d7))
