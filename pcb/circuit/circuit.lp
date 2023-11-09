@@ -449,7 +449,7 @@
   (name "L1") (value "{{MPN}}")
   (lock_assembly false)
   (attribute "INDUCTANCE" (type inductance) (unit millihenry) (value ""))
-  (device 8999518e-ef0b-435a-b712-262e0131c951
+  (device 8e5e4d32-a0b9-465f-b0a0-ef411d753e12
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
    (part "MPZ1608B471ATA00" (manufacturer "TDK Corporation")
    )

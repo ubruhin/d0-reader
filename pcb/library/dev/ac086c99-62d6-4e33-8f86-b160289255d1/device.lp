@@ -1,6 +1,6 @@
 (librepcb_device ac086c99-62d6-4e33-8f86-b160289255d1
- (name "BAT60AE6327HTSA1")
- (description "")
+ (name "Infineon BAT60A")
+ (description "Schottky diode 10V/3A in a SOD323 package.")
  (keywords "")
  (author "U. Bruhin")
  (version "0.1")
@@ -12,6 +12,8 @@
  (package 8549b946-53c6-4123-9b0c-70fa785afaf5)
  (pad 8e6f4352-0911-4d6b-a6ee-64c0c9203b22 (signal 6dd65f7f-8f6b-4b29-ade1-40bc4f84f4b8))
  (pad f4b89844-11f6-4c7a-9bc4-6f8710585eca (signal 69e22be3-d2fb-4b8f-ab4f-7fba3cff0aff))
- (part "BAT60AE6327HTSA1" (manufacturer "infineon")
+ (part "BAT60AE6327HTSA1" (manufacturer "Infineon Technologies")
+  (attribute "REVERSE_VOLTAGE" (type voltage) (unit volt) (value "10"))
+  (attribute "FORWARD_CURRENT" (type current) (unit ampere) (value "3"))
  )
 )

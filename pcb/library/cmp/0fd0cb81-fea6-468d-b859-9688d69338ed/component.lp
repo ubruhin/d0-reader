@@ -1,9 +1,9 @@
 (librepcb_component 0fd0cb81-fea6-468d-b859-9688d69338ed
  (name "RJ45 Connector 10/100Base-T +Magnetics +LEDs")
- (description "")
- (keywords "ethernet")
+ (description "Generic RJ45 10/100Base-T connector with integrated magnetics and green/yellow LEDs.")
+ (keywords "ethernet,lan")
  (author "U. Bruhin")
- (version "0.1")
+ (version "0.1.1")
  (created 2023-09-10T18:28:59Z)
  (deprecated false)
  (generated_by "")
