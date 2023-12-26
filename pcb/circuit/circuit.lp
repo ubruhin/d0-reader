@@ -856,6 +856,15 @@
   (signal f56f0de9-261f-4bbd-bbd8-ed1b9184b35b (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4))
   (signal f7d611c6-eff7-463c-a36e-47fdd94f8275 (net 3cccfa53-8a84-4ca7-aea9-b6c57fc7a96a))
  )
+ (component 9ca990ca-8c3a-44c6-9ac1-5169cf075773
+  (lib_component ef80cd5e-2689-47ee-8888-31d04fc99174)
+  (lib_variant a5995314-f535-45d4-8bd8-2d0b8a0dc42a)
+  (name "R13") (value "{{RESISTANCE}}")
+  (lock_assembly false)
+  (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4))
+  (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 6bb7efcc-8b8c-44e3-8245-c84c2f4d9fcc))
+ )
  (component 9d44c525-8cb7-4be9-a420-dde87cee9470
   (lib_component d167e0e3-6a92-4b76-b013-77b9c230e5f1)
   (lib_variant 8cd7b37f-e5fa-4af5-a8dd-d78830bba3af)
