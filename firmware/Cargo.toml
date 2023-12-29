@@ -1,0 +1,36 @@
+[package]
+edition = "2021"
+name = "d0-reader"
+version = "0.1.0"
+
+[dependencies]
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7"
+cortex-m-semihosting = "0.5.0"
+panic-halt = "0.2.0"
+systick-monotonic = "1.0.1"
+stm32-eth = { version = "0.5.2", features = ["stm32f107", "smoltcp-phy"] }
+ieee802_3_miim = "0.8"
+log = "0.4"
+defmt = { version = "0.3" }
+defmt-rtt = "0.4"
+fugit = "0.3"
+
+[dependencies.stm32f1xx-hal]
+features = ["stm32f107", "rt"]
+version = "0.10"
+
+[dependencies.smoltcp]
+version = "0.10"
+default-features = false
+features = ["medium-ethernet", "socket-tcp", "proto-ipv4", "defmt"]
+
+[[bin]]
+name = "d0-reader"
+test = false
+bench = false
+
+[profile.release]
+codegen-units = 1
+debug = 2
+lto = true
