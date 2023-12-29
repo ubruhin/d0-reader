@@ -4,21 +4,13 @@
 use defmt_rtt as _;
 use panic_halt as _;
 
+use core::{cell::RefCell, fmt::Write};
+use cortex_m::{asm, interrupt::Mutex};
 use cortex_m_rt::{entry, exception};
 
-use core::{cell::RefCell, fmt::Write};
-use cortex_m::interrupt::Mutex;
-
 use stm32f1xx_hal::{
-    afio::AfioExt,
-    gpio::PinState,
-    prelude::_stm32_hal_time_U32Ext,
-    serial::Config as SerialConfig,
-    serial::Serial,
-    pac::USART3,
-    gpio::Pin,
-    gpio::Alternate,
-    pac,
+    afio::AfioExt, gpio::Alternate, gpio::Pin, gpio::PinState, pac, pac::USART3,
+    prelude::_stm32_hal_time_U32Ext, serial::Config as SerialConfig, serial::Serial,
 };
 
 use stm32_eth::{
@@ -43,7 +35,7 @@ struct Gpio {
     pub gpioc: stm32_eth::hal::gpio::gpioc::Parts,
 }
 
-const IP_ADDRESS: Ipv4Address = Ipv4Address::new(192, 168, 1, 99);
+const IP_ADDRESS: Ipv4Address = Ipv4Address::new(192, 168, 1, 51);
 const MAC: [u8; 6] = [0x42, 0x42, 0x42, 0x42, 0x42, 0x01];
 
 static TIME: Mutex<RefCell<u64>> = Mutex::new(RefCell::new(0));
@@ -55,7 +47,7 @@ static mut SERIAL: Option<Serial<USART3, (Pin<'C', 10, Alternate>, Pin<'C', 11>)
 const RX_BUFFER_SIZE: usize = 512;
 static mut RX_BUFFER: &mut [u8; RX_BUFFER_SIZE] = &mut [0; RX_BUFFER_SIZE];
 static mut RX_LENGTH: usize = 0;
-static mut RX_ERROR: bool = false;
+static mut RX_ERRORS: u32 = 0;
 
 #[entry]
 unsafe fn main() -> ! {
@@ -66,10 +58,10 @@ unsafe fn main() -> ! {
     let mut flash = p.FLASH.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(72.MHz())
-        .hclk(72.MHz())
-        .pclk1(24.MHz())
-        .pclk2(72.MHz())
+        .sysclk(36.MHz())
+        .hclk(36.MHz())
+        .pclk1(18.MHz())
+        .pclk2(18.MHz())
         .freeze(&mut flash.acr);
     let mut afio = p.AFIO.constrain();
 
@@ -200,10 +192,6 @@ unsafe fn main() -> ! {
 
         let socket = sockets.get_mut::<TcpSocket>(server_handle);
 
-        if (rx_length > 0) && socket.can_send() {
-            let _result = socket.send_slice(&rx_data[0 .. rx_length]);
-        }
-
         if !socket.is_listening() && !socket.is_open() {
             socket.abort();
             if let Err(e) = socket.listen(80) {
@@ -211,14 +199,23 @@ unsafe fn main() -> ! {
             } else {
                 defmt::info!("Listening at {}:80...", IP_ADDRESS);
             }
-        } else if (last_tick != time) && (time % 500 == 0) {
+        } else if (last_tick != time) && (time % 1000 == 0) {
             last_tick = time;
             led.toggle();
         }
 
+        if rx_length > 0 {
+            led.toggle();
+            if socket.can_send() {
+                let _result = socket.send_slice(&rx_data[0..rx_length]);
+            }
+        }
+
         match meter_state {
             MeterState::Idle => {
-                let _ = SERIAL.as_mut().unwrap()
+                let _ = SERIAL
+                    .as_mut()
+                    .unwrap()
                     .reconfigure(
                         SerialConfig::default()
                             .baudrate(300_u32.bps())
@@ -234,9 +231,16 @@ unsafe fn main() -> ! {
             }
             MeterState::WaitForIdResponse => {
                 if is_timeout_elapsed() {
-                    SERIAL.as_mut().unwrap().tx.write_str("\x06060\r\n").unwrap();
+                    SERIAL
+                        .as_mut()
+                        .unwrap()
+                        .tx
+                        .write_str("\x06060\r\n")
+                        .unwrap();
                     while !SERIAL.as_mut().unwrap().tx.is_tx_complete() {}
-                    let _ = SERIAL.as_mut().unwrap()
+                    let _ = SERIAL
+                        .as_mut()
+                        .unwrap()
                         .reconfigure(
                             SerialConfig::default()
                                 .baudrate(19200_u32.bps())
@@ -246,7 +250,7 @@ unsafe fn main() -> ! {
                         )
                         .unwrap();
                     RX_LENGTH = 0;
-                    RX_ERROR = false;
+                    RX_ERRORS = 0;
                     SERIAL.as_mut().unwrap().rx.listen();
                     set_timeout_ms(6800);
                     meter_state = MeterState::WaitForData;
@@ -257,16 +261,34 @@ unsafe fn main() -> ! {
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
-                        if RX_ERROR {
-                            let _ = socket.send_slice(b"OK\r\n");
-                        } else {
-                            let _ = socket.send_slice(b"ERROR\r\n");
-                        }
+                        let _ = socket.send_slice(b"ERRORS: ");
+                        send_int(socket, RX_ERRORS);
+                        let _ = socket.send_slice(b"\r\n");
                     }
                 }
             }
         }
+
+        asm::wfi();
     }
+}
+
+fn send_int(socket: &mut TcpSocket, number: u32) {
+    let mut decimals = 1;
+    let mut divisor = 1;
+    while number / divisor > 9 {
+        decimals += 1;
+        divisor *= 10;
+    }
+    let mut remaining = number;
+    let mut s = [0; 16];
+    for i in 0..decimals {
+        let digit = remaining / divisor;
+        remaining -= digit * divisor;
+        divisor /= 10;
+        s[i] = b'0' + (digit as u8);
+    }
+    let _ = socket.send_slice(&s);
 }
 
 fn setup_systick(syst: &mut SYST) {
@@ -310,10 +332,10 @@ unsafe fn USART3() {
                     RX_BUFFER[RX_LENGTH] = w & 0x7F;
                     RX_LENGTH += 1;
                 } else {
-                    RX_ERROR = true;
+                    RX_ERRORS += 1;
                 }
             } else {
-                RX_ERROR = true;
+                RX_ERRORS += 1;
             }
         }
     }
