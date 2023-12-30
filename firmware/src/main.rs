@@ -30,6 +30,7 @@ use smoltcp::{
 };
 
 const IP_ADDRESS: Ipv4Address = Ipv4Address::new(192, 168, 1, 51);
+const TCP_PORT: u16 = 1337;
 const MAC: [u8; 6] = [0x42, 0x42, 0x42, 0x42, 0x42, 0x01];
 
 static TIME: Mutex<RefCell<u64>> = Mutex::new(RefCell::new(0));
@@ -178,10 +179,10 @@ unsafe fn main() -> ! {
 
         if !socket.is_listening() && !socket.is_open() {
             socket.abort();
-            if let Err(e) = socket.listen(80) {
+            if let Err(e) = socket.listen(TCP_PORT) {
                 defmt::error!("TCP listen error: {:?}", e)
             } else {
-                defmt::info!("Listening at {}:80...", IP_ADDRESS);
+                defmt::info!("Listening at {}:{}...", IP_ADDRESS, TCP_PORT);
             }
         }
 
@@ -242,9 +243,9 @@ unsafe fn main() -> ! {
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
-                        let _ = socket.send_slice(b"ERRORS: ");
+                        let _ = socket.send_slice(b"ERRORS(");
                         send_int(socket, RX_ERRORS);
-                        let _ = socket.send_slice(b"\r\n");
+                        let _ = socket.send_slice(b")\r\n");
                     }
                 }
             }
@@ -269,7 +270,7 @@ fn send_int(socket: &mut TcpSocket, number: u32) {
         divisor /= 10;
         s[i] = b'0' + (digit as u8);
     }
-    let _ = socket.send_slice(&s);
+    let _ = socket.send_slice(&s[0..decimals]);
 }
 
 #[exception]
