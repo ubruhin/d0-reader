@@ -4,19 +4,21 @@
 use defmt_rtt as _;
 use panic_halt as _;
 
+use fugit::RateExtU32;
+
 use core::{cell::RefCell, fmt::Write};
 use cortex_m::{asm, interrupt::Mutex};
 use cortex_m_rt::{entry, exception};
 
 use stm32f1xx_hal::{
-    afio::AfioExt, gpio::Alternate, gpio::Pin, gpio::PinState, pac, pac::USART3,
-    prelude::_stm32_hal_time_U32Ext, serial::Config as SerialConfig, serial::Serial,
+    afio::AfioExt, gpio::Alternate, gpio::Pin, pac, pac::USART3, prelude::_stm32_hal_time_U32Ext,
+    serial::Config as SerialConfig, serial::Serial,
 };
 
 use stm32_eth::{
     dma::{RxRingEntry, TxRingEntry},
     hal::{flash::FlashExt, gpio::GpioExt, rcc::RccExt},
-    stm32::{interrupt, CorePeripherals, Peripherals, SYST},
+    stm32::{interrupt, CorePeripherals, Peripherals},
     EthPins, Parts, PartsIn,
 };
 
@@ -27,21 +29,10 @@ use smoltcp::{
     wire::{EthernetAddress, IpCidr, Ipv4Address, Ipv4Cidr},
 };
 
-use fugit::RateExtU32;
-
-struct Gpio {
-    pub gpioa: stm32_eth::hal::gpio::gpioa::Parts,
-    pub gpiob: stm32_eth::hal::gpio::gpiob::Parts,
-    pub gpioc: stm32_eth::hal::gpio::gpioc::Parts,
-}
-
 const IP_ADDRESS: Ipv4Address = Ipv4Address::new(192, 168, 1, 51);
 const MAC: [u8; 6] = [0x42, 0x42, 0x42, 0x42, 0x42, 0x01];
 
 static TIME: Mutex<RefCell<u64>> = Mutex::new(RefCell::new(0));
-static TIMEOUT: Mutex<RefCell<u32>> = Mutex::new(RefCell::new(0));
-static ETH_PENDING: Mutex<RefCell<bool>> = Mutex::new(RefCell::new(false));
-
 static mut SERIAL: Option<Serial<USART3, (Pin<'C', 10, Alternate>, Pin<'C', 11>)>> = None;
 
 const RX_BUFFER_SIZE: usize = 512;
@@ -66,22 +57,15 @@ unsafe fn main() -> ! {
     let mut afio = p.AFIO.constrain();
 
     defmt::info!("Setting up SysTick");
-    setup_systick(&mut core.SYST);
+    core.SYST.set_reload(4500);
+    core.SYST.enable_counter();
+    core.SYST.enable_interrupt();
 
     defmt::info!("Setting up pins");
-    let gpio = Gpio {
-        gpioa: p.GPIOA.split(),
-        gpiob: p.GPIOB.split(),
-        gpioc: p.GPIOC.split(),
-    };
-    let Gpio {
-        mut gpioa,
-        mut gpiob,
-        mut gpioc,
-    } = gpio;
-    let mut led = gpiob
-        .pb14
-        .into_push_pull_output_with_state(&mut gpiob.crh, PinState::High);
+    let mut gpioa = p.GPIOA.split();
+    let mut gpiob = p.GPIOB.split();
+    let mut gpioc = p.GPIOC.split();
+    let mut led = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
     let ir_tx = gpioc.pc10.into_alternate_push_pull(&mut gpioc.crh);
     let ir_rx = gpioc.pc11;
     let ref_clk = gpioa.pa1.into_floating_input(&mut gpioa.crl);
@@ -134,8 +118,6 @@ unsafe fn main() -> ! {
         eth_pins,
     )
     .unwrap();
-
-    defmt::info!("Enabling interrupts");
     dma.enable_interrupt();
 
     defmt::info!("Configuring smoltcp");
@@ -159,7 +141,8 @@ unsafe fn main() -> ! {
 
     defmt::info!("Setup done, ready for connections!");
 
-    let mut last_tick: u64 = 0;
+    let mut led_toggle_time: u64 = 0;
+    let mut state_enter_time: u64 = 0;
 
     enum MeterState {
         Idle,
@@ -173,16 +156,17 @@ unsafe fn main() -> ! {
 
     loop {
         let time: u64 = cortex_m::interrupt::free(|cs| *TIME.borrow(cs).borrow());
-        cortex_m::interrupt::free(|cs| {
-            let mut eth_pending = ETH_PENDING.borrow(cs).borrow_mut();
-            *eth_pending = false;
-        });
 
         cortex_m::interrupt::free(|_cs| {
             *rx_data = RX_BUFFER.clone();
             rx_length = RX_LENGTH;
             RX_LENGTH = 0;
         });
+
+        if (time - led_toggle_time) > 1000 {
+            led.toggle();
+            led_toggle_time = time;
+        }
 
         iface.poll(
             Instant::from_millis(time as i64),
@@ -199,9 +183,6 @@ unsafe fn main() -> ! {
             } else {
                 defmt::info!("Listening at {}:80...", IP_ADDRESS);
             }
-        } else if (last_tick != time) && (time % 1000 == 0) {
-            last_tick = time;
-            led.toggle();
         }
 
         if rx_length > 0 {
@@ -226,11 +207,11 @@ unsafe fn main() -> ! {
                     .unwrap();
                 SERIAL.as_mut().unwrap().tx.write_str("/?!\r\n").unwrap();
                 while !SERIAL.as_mut().unwrap().tx.is_tx_complete() {}
-                set_timeout_ms(1200);
+                state_enter_time = time;
                 meter_state = MeterState::WaitForIdResponse;
             }
             MeterState::WaitForIdResponse => {
-                if is_timeout_elapsed() {
+                if (time - state_enter_time) > 1200 {
                     SERIAL
                         .as_mut()
                         .unwrap()
@@ -252,12 +233,12 @@ unsafe fn main() -> ! {
                     RX_LENGTH = 0;
                     RX_ERRORS = 0;
                     SERIAL.as_mut().unwrap().rx.listen();
-                    set_timeout_ms(6800);
+                    state_enter_time = time;
                     meter_state = MeterState::WaitForData;
                 }
             }
             MeterState::WaitForData => {
-                if is_timeout_elapsed() {
+                if (time - state_enter_time) > 6800 {
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
@@ -291,35 +272,11 @@ fn send_int(socket: &mut TcpSocket, number: u32) {
     let _ = socket.send_slice(&s);
 }
 
-fn setup_systick(syst: &mut SYST) {
-    syst.set_reload(4500);
-    syst.enable_counter();
-    syst.enable_interrupt();
-}
-
-fn set_timeout_ms(value: u32) {
-    cortex_m::interrupt::free(|cs| {
-        *TIMEOUT.borrow(cs).borrow_mut() = value;
-    });
-}
-
-fn is_timeout_elapsed() -> bool {
-    let mut tmp = 1;
-    cortex_m::interrupt::free(|cs| {
-        tmp = *TIMEOUT.borrow(cs).borrow();
-    });
-    return tmp == 0;
-}
-
 #[exception]
 fn SysTick() {
     cortex_m::interrupt::free(|cs| {
         let mut time = TIME.borrow(cs).borrow_mut();
         *time += 1;
-        let mut timeout = TIMEOUT.borrow(cs).borrow_mut();
-        if *timeout > 0 {
-            *timeout -= 1;
-        }
     })
 }
 
@@ -343,10 +300,5 @@ unsafe fn USART3() {
 
 #[interrupt]
 fn ETH() {
-    cortex_m::interrupt::free(|cs| {
-        let mut eth_pending = ETH_PENDING.borrow(cs).borrow_mut();
-        *eth_pending = true;
-    });
-
     stm32_eth::eth_interrupt_handler();
 }
