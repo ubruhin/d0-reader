@@ -663,7 +663,7 @@
   (lib_variant a5995314-f535-45d4-8bd8-2d0b8a0dc42a)
   (name "R2") (value "{{RESISTANCE}}")
   (lock_assembly false)
-  (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "10"))
+  (attribute "RESISTANCE" (type resistance) (unit kiloohm) (value "1"))
   (device 483a71eb-318e-448e-82ff-f02efc4821aa
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
   )
