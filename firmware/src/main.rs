@@ -143,7 +143,7 @@ unsafe fn main() -> ! {
     defmt::info!("Setup done, ready for connections!");
 
     let mut led_toggle_time: u64 = 0;
-    let mut state_enter_time: u64 = 0;
+    let mut start_measure_time: u64 = 0;
 
     enum MeterState {
         Idle,
@@ -195,6 +195,7 @@ unsafe fn main() -> ! {
 
         match meter_state {
             MeterState::Idle => {
+                start_measure_time = time;
                 let _ = SERIAL
                     .as_mut()
                     .unwrap()
@@ -208,11 +209,10 @@ unsafe fn main() -> ! {
                     .unwrap();
                 SERIAL.as_mut().unwrap().tx.write_str("/?!\r\n").unwrap();
                 while !SERIAL.as_mut().unwrap().tx.is_tx_complete() {}
-                state_enter_time = time;
                 meter_state = MeterState::WaitForIdResponse;
             }
             MeterState::WaitForIdResponse => {
-                if (time - state_enter_time) > 1200 {
+                if (time - start_measure_time) > 1500 {
                     SERIAL
                         .as_mut()
                         .unwrap()
@@ -234,12 +234,11 @@ unsafe fn main() -> ! {
                     RX_LENGTH = 0;
                     RX_ERRORS = 0;
                     SERIAL.as_mut().unwrap().rx.listen();
-                    state_enter_time = time;
                     meter_state = MeterState::WaitForData;
                 }
             }
             MeterState::WaitForData => {
-                if (time - state_enter_time) > 6800 {
+                if (time - start_measure_time) >= 9999 {
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
