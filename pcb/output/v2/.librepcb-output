@@ -1,0 +1,15 @@
+assembly/d0-reader_v2_BOM_Std.csv | f20ab84b-18cc-4e01-b11a-10391a040bb1
+d0-reader_v2.lppz | 7c2b1c9f-87f2-4e1f-bd63-4667716764ce
+d0-reader_v2_Assembly.pdf | a9e92fdc-1b90-4eaa-a8f8-73b0484c79f2
+d0-reader_v2_Schematic.pdf | a66d2f00-9e89-4f9e-939a-6157e56c65f4
+gerber/d0-reader_v2_COPPER-BOTTOM.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_COPPER-TOP.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_DRILLS-NPTH.drl | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_DRILLS-PTH.drl | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_OUTLINES.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SILKSCREEN-BOTTOM.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SILKSCREEN-TOP.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SOLDERMASK-BOTTOM.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SOLDERMASK-TOP.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SOLDERPASTE-BOTTOM.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
+gerber/d0-reader_v2_SOLDERPASTE-TOP.gbr | dee1ac11-916a-4da8-8fa7-171e11c37b71
