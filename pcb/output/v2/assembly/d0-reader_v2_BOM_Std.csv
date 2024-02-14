@@ -6,7 +6,7 @@ Quantity,Designators,Package,Value,MPN,Manufacturer,Value[2],MPN[2],Manufacturer
 1,C11,CAPC1608 (0603),470pF,,,,,
 1,C15,CAPC1608 (0603),4.7μF,,,,,
 1,C16,CAPC1608 (0603),22nF,,,,,
-1,C17,Elko D6.3x5.8mm SMT,100μF 63V,HHXD630ARA100MF61G,Chemi-Con,,,
+1,C17,Elko D6.3x5.8mm SMT,10μF 63V,HHXD630ARA100MF61G,Chemi-Con,,,
 1,C18,CAPC3216 (1206),2.2μF 100V,,,,,
 1,C19,CAPC2012 (0805),68nF 100V,,,,,
 3,"C20, C21, C22",CAPC3216 (1206),22μF,,,,,

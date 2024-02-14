@@ -1159,7 +1159,7 @@
   (lib_variant 5412add2-af9c-44b8-876d-a0fb7c201897)
   (name "C17") (value "{{CAPACITANCE}} {{VOLTAGE}}")
   (lock_assembly false)
-  (attribute "CAPACITANCE" (type capacitance) (unit microfarad) (value "100"))
+  (attribute "CAPACITANCE" (type capacitance) (unit microfarad) (value "10"))
   (attribute "VOLTAGE" (type voltage) (unit volt) (value "63"))
   (device e269063e-5bb6-4ec2-8268-d8ae95513385
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
