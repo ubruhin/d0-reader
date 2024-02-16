@@ -4,7 +4,7 @@
 use defmt_rtt as _;
 use panic_halt as _;
 
-use fugit::RateExtU32;
+use fugit::{ExtU32, RateExtU32};
 
 use core::{cell::RefCell, fmt::Write};
 use cortex_m::{asm, interrupt::Mutex};
@@ -13,6 +13,7 @@ use cortex_m_rt::{entry, exception};
 use stm32f1xx_hal::{
     afio::AfioExt, gpio::Alternate, gpio::Pin, pac, pac::USART3, prelude::_stm32_hal_time_U32Ext,
     serial::Config as SerialConfig, serial::Serial,
+    watchdog::IndependentWatchdog,
 };
 
 use stm32_eth::{
@@ -56,6 +57,10 @@ unsafe fn main() -> ! {
         .pclk2(18.MHz())
         .freeze(&mut flash.acr);
     let mut afio = p.AFIO.constrain();
+
+    defmt::info!("Setting up watchdog");
+    let mut watchdog = IndependentWatchdog::new(p.IWDG);
+    watchdog.start(20_000.millis());
 
     defmt::info!("Setting up SysTick");
     core.SYST.set_reload(4500);
@@ -167,6 +172,7 @@ unsafe fn main() -> ! {
         if (time - led_toggle_time) > 1000 {
             led.toggle();
             led_toggle_time = time;
+            watchdog.feed();
         }
 
         iface.poll(
