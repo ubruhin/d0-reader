@@ -245,7 +245,9 @@ unsafe fn main() -> ! {
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
-                        let _ = socket.send_slice(b"ERRORS(");
+                        let _ = socket.send_slice(b"UPTIME(");
+                        send_int(socket, (time / 1000) as u32);
+                        let _ = socket.send_slice(b")\r\nERRORS(");
                         send_int(socket, RX_ERRORS);
                         let _ = socket.send_slice(b")\r\n");
                     }
