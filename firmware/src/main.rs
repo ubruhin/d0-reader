@@ -239,6 +239,9 @@ unsafe fn main() -> ! {
             }
             MeterState::WaitForData => {
                 if (time - start_measure_time) >= 9999 {
+                    if RX_ERRORS == 1 {
+                        RX_ERRORS = 0;
+                    }
                     SERIAL.as_mut().unwrap().rx.unlisten();
                     meter_state = MeterState::Idle;
                     if socket.can_send() {
