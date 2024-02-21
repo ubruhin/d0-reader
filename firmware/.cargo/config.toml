@@ -3,3 +3,6 @@ runner = "probe-run --chip STM32F107RC"
 
 [build]
 target = "thumbv7m-none-eabi"
+
+[alias]
+download = "flash --chip STM32F107RC"
