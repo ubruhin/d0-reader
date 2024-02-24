@@ -1,6 +1,16 @@
 **/*.rs.bk
+*.bin
+*.elf
+*.hex
+*.map
 .#*
 .gdb_history
+cmake_install.cmake
+CMakeCache.txt
+CMakeLists.txt.user
+Makefile
+build/
+CMakeFiles/
 target/
 
 # editor files

@@ -1,0 +1,12 @@
+[submodule "firmware/cmsis_core"]
+	path = firmware/cmsis_core
+	url = https://github.com/STMicroelectronics/cmsis_core.git
+[submodule "firmware/cmsis_device_f1"]
+	path = firmware/cmsis_device_f1
+	url = https://github.com/STMicroelectronics/cmsis_device_f1.git
+[submodule "firmware/stm32f1xx_hal_driver"]
+	path = firmware/stm32f1xx_hal_driver
+	url = https://github.com/STMicroelectronics/stm32f1xx_hal_driver.git
+[submodule "firmware/lwip"]
+	path = firmware/lwip
+	url = https://github.com/lwip-tcpip/lwip.git
