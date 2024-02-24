@@ -1,6 +1,6 @@
 #include "gpio.h"
+#include "tcpsocket.h"
 #include "ethernetif.h"
-#include "tcp_echoserver.h"
 #include "lwip/apps/mdns.h"
 #include "lwip/dhcp.h"
 #include "lwip/igmp.h"
@@ -9,6 +9,7 @@
 #include "lwip/timeouts.h"
 #include "netif/ethernet.h"
 #include "stm32f1xx_hal.h"
+#include <cassert>
 
 // System clock variable accessed by the HAL driver.
 uint32_t SystemCoreClock = 36000000;
@@ -101,11 +102,11 @@ int main() {
   mdns_resp_add_service(&gnetif, "SmartMeter", "_smartmeter", DNSSD_PROTO_TCP, 80, NULL, NULL);
 
   // Start application.
-  tcp_echoserver_init();
+  TcpSocket socket(42);
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
-    if (netif_is_link_up(&gnetif)) {
+    if (socket.canSend()) {
       led.setHigh();
     } else {
       led.setLow();
@@ -174,10 +175,20 @@ extern "C" void SysTick_Handler(void) {
   HAL_IncTick();
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line) {
   UNUSED(file);
   UNUSED(line);
+  while (1);
+}
+#endif
+
+#ifdef DEBUG
+void __assert_func(const char* file, int line, const char* func, const char* cond) {
+  UNUSED(file);
+  UNUSED(line);
+  UNUSED(func);
+  UNUSED(cond);
   while (1);
 }
 #endif

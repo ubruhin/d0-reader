@@ -20,7 +20,7 @@ add_executable(
     source/ethernetif.c
     source/gpio.cpp
     source/main.cpp
-    source/tcp_echoserver.c
+    source/tcpsocket.cpp
     lwip/src/apps/mdns/mdns_domain.c
     lwip/src/apps/mdns/mdns_out.c
     lwip/src/apps/mdns/mdns.c
@@ -71,7 +71,7 @@ target_include_directories(
 target_compile_definitions(
     d0-reader PUBLIC
     STM32F107xC
-    $<$<CONFIG:Debug>:DEBUG>
+    $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>
 )
 
 target_compile_options(
