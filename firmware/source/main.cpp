@@ -44,9 +44,10 @@ extern "C" void SystemInit(void) {
   // Configure vector table offset.
   SCB->VTOR = FLASH_BASE;
 
-  // Set flash wait states to 1.
+  // Set flash wait states to 1 and enable prefetch buffer.
   FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
   FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_1;
+  FLASH->ACR |= (uint32_t)FLASH_ACR_PRFTBE;
 
   // Set clock dividers.
   RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;  // HCLK = SYSCLK
@@ -65,9 +66,8 @@ extern "C" void SystemInit(void) {
   while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08);
 }
 
-int main() {
-  // Initialize SysTick to 1ms.
-  HAL_Init();
+void mainTask(void* params) {
+    UNUSED(params);
 
   // Configure priority grouping for FreeRTOS.
   NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
@@ -122,11 +122,11 @@ int main() {
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
-    if (netif_is_link_up(&gnetif)) {
-      led.setHigh();
-    } else {
-      led.setLow();
-    }
+    //if (netif_is_link_up(&gnetif)) {
+    //  led.setHigh();
+    //} else {
+    //  led.setLow();
+    //}
 
     ethernetif_input(&gnetif);
     sys_check_timeouts();
@@ -136,11 +136,19 @@ int main() {
       ethernetif_update_link_status(&gnetif);
       DHCP_Process(&gnetif);
 
-      const char* msg = "Hello world!\n";
-      socket.write((const uint8_t*)msg, strlen(msg));
-      uart.sendBlocking((const uint8_t*)"Hello!\n", 8U);
+      //const char* msg = "Hello world!\n";
+      //socket.write((const uint8_t*)msg, strlen(msg));
+      //uart.sendBlocking((const uint8_t*)"Hello!\n", 8U);
+
+      led.toggle();
     }
   }
+}
+
+int main() {
+  xTaskCreate(mainTask, "mainTask", 512, NULL, configMAX_PRIORITIES - 1, NULL);
+  vTaskStartScheduler();
+  while(1);
 }
 
 void ethernetif_notify_conn_changed(struct netif *netif) {
@@ -190,6 +198,10 @@ void DHCP_Process(struct netif *netif) {
     }
   }
 }
+
+//extern "C" void HAL_Delay(uint32_t Delay) {
+//  vTaskDelay(Delay);
+//}
 
 extern "C" void xPortSysTickHandler(void);
 
