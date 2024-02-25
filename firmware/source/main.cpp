@@ -2,6 +2,8 @@
 #include "tcpsocket.h"
 #include "uart.h"
 #include "ethernetif.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "lwip/apps/mdns.h"
 #include "lwip/dhcp.h"
 #include "lwip/igmp.h"
@@ -67,6 +69,9 @@ int main() {
   // Initialize SysTick to 1ms.
   HAL_Init();
 
+  // Configure priority grouping for FreeRTOS.
+  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
   // Enable peripheral clocks.
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -117,7 +122,7 @@ int main() {
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
-    if (socket.canWrite()) {
+    if (netif_is_link_up(&gnetif)) {
       led.setHigh();
     } else {
       led.setLow();
@@ -186,24 +191,36 @@ void DHCP_Process(struct netif *netif) {
   }
 }
 
+extern "C" void xPortSysTickHandler(void);
+
 extern "C" void SysTick_Handler(void) {
   HAL_IncTick();
+  xPortSysTickHandler();
+}
+
+extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+  UNUSED(xTask);
+  UNUSED(pcTaskName);
+  __disable_irq();
+  while (1);
 }
 
 #ifdef USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line) {
   UNUSED(file);
   UNUSED(line);
+  __disable_irq();
   while (1);
 }
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
 void __assert_func(const char* file, int line, const char* func, const char* cond) {
   UNUSED(file);
   UNUSED(line);
   UNUSED(func);
   UNUSED(cond);
+  __disable_irq();
   while (1);
 }
 #endif

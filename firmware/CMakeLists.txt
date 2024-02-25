@@ -22,6 +22,11 @@ add_executable(
     source/main.cpp
     source/tcpsocket.cpp
     source/uart.cpp
+    freertos/list.c
+    freertos/queue.c
+    freertos/tasks.c
+    freertos/portable/GCC/ARM_CM3/port.c
+    freertos/portable/MemMang/heap_1.c
     lwip/src/apps/mdns/mdns_domain.c
     lwip/src/apps/mdns/mdns_out.c
     lwip/src/apps/mdns/mdns.c
@@ -63,6 +68,8 @@ target_include_directories(
     d0-reader PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/source
     ${CMAKE_CURRENT_SOURCE_DIR}/source/config
+    ${CMAKE_CURRENT_SOURCE_DIR}/freertos/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/freertos/portable/GCC/ARM_CM3
     ${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/stm32f1xx_hal_driver/Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/cmsis_device_f1/Include

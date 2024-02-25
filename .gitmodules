@@ -10,3 +10,6 @@
 [submodule "firmware/lwip"]
 	path = firmware/lwip
 	url = https://github.com/lwip-tcpip/lwip.git
+[submodule "firmware/freertos"]
+	path = firmware/freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
