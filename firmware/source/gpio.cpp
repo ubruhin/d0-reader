@@ -37,8 +37,13 @@ Gpio Gpio::outputPushPull(GPIO_TypeDef* gpio, uint32_t pinNumber, bool state) {
   return obj;
 }
 
-Gpio Gpio::alternatePushPull(GPIO_TypeDef* gpio, uint32_t pinNumber) {
+Gpio Gpio::alternatePushPull(GPIO_TypeDef* gpio, uint32_t pinNumber, bool resetState) {
   Gpio obj(gpio, pinNumber);
+  if (resetState) {
+    obj.setHigh();
+  } else {
+    obj.setLow();
+  }
   setCrl(gpio, pinNumber, 0b11U, 0b10U);
   return obj;
 }

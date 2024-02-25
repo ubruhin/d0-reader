@@ -1,5 +1,6 @@
 #include "gpio.h"
 #include "tcpsocket.h"
+#include "uart.h"
 #include "ethernetif.h"
 #include "lwip/apps/mdns.h"
 #include "lwip/dhcp.h"
@@ -75,6 +76,15 @@ int main() {
   // Initialize general purpose I/Os.
   Gpio led = Gpio::outputPushPull(GPIOB, 14U, false);
 
+  // Initialize UART.
+  __HAL_RCC_USART3_CLK_ENABLE();
+  __HAL_AFIO_REMAP_USART3_PARTIAL();
+  Gpio::alternatePushPull(GPIOC, 10U, true);
+  Gpio::inputFloating(GPIOC, 11U);
+  Uart uart(USART3, USART3_IRQn, SystemCoreClock);
+  uart.setBaudrate(19200U);
+  uart.enable();
+
   // Initialize Ethernet hardware.
   Gpio::alternatePushPull(GPIOA, 2U);  // RMII_MDIO
   Gpio::alternatePushPull(GPIOB, 11U);  // RMII_TXEN
@@ -123,6 +133,7 @@ int main() {
 
       const char* msg = "Hello world!\n";
       socket.write((const uint8_t*)msg, strlen(msg));
+      uart.sendBlocking((const uint8_t*)"Hello!\n", 8U);
     }
   }
 }

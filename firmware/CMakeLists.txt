@@ -21,6 +21,7 @@ add_executable(
     source/gpio.cpp
     source/main.cpp
     source/tcpsocket.cpp
+    source/uart.cpp
     lwip/src/apps/mdns/mdns_domain.c
     lwip/src/apps/mdns/mdns_out.c
     lwip/src/apps/mdns/mdns.c

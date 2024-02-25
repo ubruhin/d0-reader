@@ -13,7 +13,7 @@ public:
 
   static Gpio inputFloating(GPIO_TypeDef* gpio, uint32_t pinNumber);
   static Gpio outputPushPull(GPIO_TypeDef* gpio, uint32_t pinNumber, bool state);
-  static Gpio alternatePushPull(GPIO_TypeDef* gpio, uint32_t pinNumber);
+  static Gpio alternatePushPull(GPIO_TypeDef* gpio, uint32_t pinNumber, bool resetState = false);
 
 private:
   Gpio(GPIO_TypeDef* gpio, uint32_t pinNumber);
