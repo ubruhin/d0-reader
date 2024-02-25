@@ -1,9 +1,5 @@
 #pragma once
 
-// System
-#define NO_SYS                      1
-#define SYS_LIGHTWEIGHT_PROT        0
-
 // Memory Management
 #define MEM_ALIGNMENT               4
 #define MEM_SIZE                    (10*1024)
@@ -57,8 +53,8 @@
 #define LWIP_NETIF_LINK_CALLBACK    1
 
 // APIs
-#define LWIP_NETCONN                0
-#define LWIP_SOCKET                 0
+#define LWIP_NETCONN                1
+#define LWIP_SOCKET                 1
 
 // Disable checksum calculations since it is done by the peripheral.
 #define CHECKSUM_GEN_IP             0

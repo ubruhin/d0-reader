@@ -1,5 +1,4 @@
 #include "gpio.h"
-#include "tcpsocket.h"
 #include "uart.h"
 #include "ethernetif.h"
 #include "FreeRTOS.h"
@@ -9,6 +8,7 @@
 #include "lwip/igmp.h"
 #include "lwip/init.h"
 #include "lwip/netif.h"
+#include "lwip/sockets.h"
 #include "lwip/timeouts.h"
 #include "netif/ethernet.h"
 #include "stm32f1xx_hal.h"
@@ -66,7 +66,59 @@ extern "C" void SystemInit(void) {
   while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08);
 }
 
-void mainTask(void* params) {
+static void tcpTask(void* params) {
+  Gpio led = Gpio::outputPushPull(GPIOB, 14U, true);
+
+  char rec_buffer[10];
+	char* rec_data;
+	uint8_t rec_size;
+	uint8_t client_disconnect = 1;
+	int32_t res;
+	const uint16_t server_port = 42;
+
+	int32_t tcp_server_socket = 0;
+	int32_t tcp_client_socket = 0;
+	struct sockaddr_in server_addr;
+	struct sockaddr_in client_addr;
+	socklen_t client_addr_len = sizeof(client_addr);
+
+	tcp_server_socket = lwip_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	memset(&server_addr, 0, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = lwip_htonl(INADDR_ANY);
+	server_addr.sin_port = htons(server_port);
+	res = lwip_bind(tcp_server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
+
+	res = lwip_listen(tcp_server_socket, 5);
+
+	//Up to here there are no errors
+	while(1){
+		//Accept new client
+		tcp_client_socket = lwip_accept(tcp_server_socket, (struct sockaddr *)&client_addr, &client_addr_len);
+
+		//After the third call of accept() it returns the error -1
+		if (tcp_client_socket < 0){
+      led.toggle();
+		} else {
+      led.setLow();
+      client_disconnect = 1;
+      while(client_disconnect){
+        //receive messages from the client
+        rec_size = lwip_recv(tcp_client_socket, rec_buffer, 128, 0);
+        if (rec_size == 0) { //client disconnected from server
+          client_disconnect = 0; //go back to accept()
+          lwip_close(tcp_client_socket);
+        }
+      }
+      led.setHigh();
+    }
+    vTaskDelay(300);
+
+	}
+}
+
+static void mainTask(void* params) {
     UNUSED(params);
 
   // Configure priority grouping for FreeRTOS.
@@ -79,7 +131,7 @@ void mainTask(void* params) {
   __HAL_RCC_AFIO_CLK_ENABLE();
 
   // Initialize general purpose I/Os.
-  Gpio led = Gpio::outputPushPull(GPIOB, 14U, false);
+  //Gpio led = Gpio::outputPushPull(GPIOB, 14U, false);
 
   // Initialize UART.
   __HAL_RCC_USART3_CLK_ENABLE();
@@ -118,7 +170,10 @@ void mainTask(void* params) {
   mdns_resp_add_service(&gnetif, "SmartMeter", "_smartmeter", DNSSD_PROTO_TCP, 80, NULL, NULL);
 
   // Start application.
-  TcpSocket socket(42);
+
+  TaskHandle_t tcpTaskHandle;
+  xTaskCreate(tcpTask, "tcpTask", 512, NULL, 1, &tcpTaskHandle);
+  assert(tcpTaskHandle);
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
@@ -139,14 +194,14 @@ void mainTask(void* params) {
       //const char* msg = "Hello world!\n";
       //socket.write((const uint8_t*)msg, strlen(msg));
       //uart.sendBlocking((const uint8_t*)"Hello!\n", 8U);
-
-      led.toggle();
     }
   }
 }
 
 int main() {
-  xTaskCreate(mainTask, "mainTask", 512, NULL, configMAX_PRIORITIES - 1, NULL);
+  TaskHandle_t taskHandle;
+  xTaskCreate(mainTask, "mainTask", 512, NULL, 0, &taskHandle);
+  assert(taskHandle);
   vTaskStartScheduler();
   while(1);
 }
@@ -199,9 +254,9 @@ void DHCP_Process(struct netif *netif) {
   }
 }
 
-//extern "C" void HAL_Delay(uint32_t Delay) {
-//  vTaskDelay(Delay);
-//}
+extern "C" void HAL_Delay(uint32_t Delay) {
+  vTaskDelay(Delay);
+}
 
 extern "C" void xPortSysTickHandler(void);
 
