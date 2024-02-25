@@ -20,6 +20,7 @@
 
 // TCP
 #define LWIP_TCP                    1
+#define LWIP_TCP_KEEPALIVE          1
 #define TCP_TTL                     255
 #define TCP_QUEUE_OOSEQ             0
 #define TCP_MSS                     (1500 - 40)

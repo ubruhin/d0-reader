@@ -10,6 +10,7 @@
 #include "netif/ethernet.h"
 #include "stm32f1xx_hal.h"
 #include <cassert>
+#include <cstring>
 
 // System clock variable accessed by the HAL driver.
 uint32_t SystemCoreClock = 36000000;
@@ -106,7 +107,7 @@ int main() {
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
-    if (socket.canSend()) {
+    if (socket.canWrite()) {
       led.setHigh();
     } else {
       led.setLow();
@@ -119,6 +120,9 @@ int main() {
       dhcpFineTimer = HAL_GetTick();
       ethernetif_update_link_status(&gnetif);
       DHCP_Process(&gnetif);
+
+      const char* msg = "Hello world!\n";
+      socket.write((const uint8_t*)msg, strlen(msg));
     }
   }
 }

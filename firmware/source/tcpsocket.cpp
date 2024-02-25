@@ -33,29 +33,37 @@ static err_t _sent(void* arg, struct tcp_pcb* tpcb, u16_t len) {
 }
 
 TcpSocket::TcpSocket(u16_t port)
-  : mPcb(tcp_new()), mState(State::None), mRetries(0U), mBuf(nullptr) {
-    assert(mPcb != nullptr);
+  : mListenPcb(tcp_new()), mSocketPcb(nullptr), mState(State::None), mRetries(0U), mRxBuf(nullptr) {
+    assert(mListenPcb != nullptr);
 
-    if (tcp_bind(mPcb, IP_ADDR_ANY, port) == ERR_OK) {
-      mPcb = tcp_listen(mPcb);
-      tcp_arg(mPcb, this);
-      tcp_accept(mPcb, _accept);
+    if (tcp_bind(mListenPcb, IP_ADDR_ANY, port) == ERR_OK) {
+      mListenPcb = tcp_listen(mListenPcb);
+      tcp_arg(mListenPcb, this);
+      tcp_accept(mListenPcb, _accept);
     } else {
-      memp_free(MEMP_TCP_PCB, mPcb);
+      memp_free(MEMP_TCP_PCB, mListenPcb);
     }
 }
 
-bool TcpSocket::canSend() const {
+bool TcpSocket::canWrite() const {
   return (mState == State::Accepted) || (mState == State::Received);
+}
+
+void TcpSocket::write(const uint8_t* data, u16_t len) {
+  if (mSocketPcb && (tcp_write(mSocketPcb, data, len, TCP_WRITE_FLAG_COPY) != ERR_OK)) {
+    close();
+  }
 }
 
 err_t TcpSocket::cb_accept(struct tcp_pcb* newpcb, err_t err) {
   LWIP_UNUSED_ARG(err);
 
+  close();
+
+  mSocketPcb = newpcb;
   mState = State::Accepted;
-  mPcb = newpcb;
   mRetries = 0U;
-  mBuf = nullptr;
+  mRxBuf = nullptr;
 
   tcp_setprio(newpcb, TCP_PRIO_MIN);
   tcp_recv(newpcb, _recv);
@@ -70,9 +78,9 @@ err_t TcpSocket::cb_recv(struct tcp_pcb* tpcb, struct pbuf* p, err_t err) {
   // If we receive an empty tcp frame from client => close connection.
   if (p == nullptr) {
     mState = State::Closing;
-    if (mBuf == nullptr) {
+    if (mRxBuf == nullptr) {
        // We're done sending, close connection.
-       close(tpcb);
+       close();
     } else {
       // We're not done yet, acknowledge received packet.
       tcp_sent(tpcb, _sent);
@@ -84,7 +92,7 @@ err_t TcpSocket::cb_recv(struct tcp_pcb* tpcb, struct pbuf* p, err_t err) {
   } else if (err != ERR_OK) {
     // A non empty frame was received from client but for some reason err != ERR_OK.
     if (p != nullptr) {
-      mBuf = nullptr;
+      mRxBuf = nullptr;
       pbuf_free(p);
     }
     ret_err = err;
@@ -93,38 +101,40 @@ err_t TcpSocket::cb_recv(struct tcp_pcb* tpcb, struct pbuf* p, err_t err) {
     mState = State::Received;
 
     // Store reference to incoming pbuf (chain).
-    mBuf = p;
+    //mRxBuf = p;
 
     // Initialize LwIP tcp_sent callback function.
-    tcp_sent(tpcb, _sent);
+    //tcp_sent(tpcb, _sent);
 
     // Send back the received data (echo).
-    send(tpcb);
+    //send(tpcb);
 
+    tcp_recved(tpcb, p->len);
     ret_err = ERR_OK;
   } else if (mState == State::Received) {
     // More data received from client and previous data has been already sent.
-    if (mBuf == nullptr) {
-      mBuf = p;
-
-      // Send back received data.
-      send(tpcb);
-    } else {
-      // Chain pbufs to the end of what we recv'ed previously.
-      struct pbuf* ptr = mBuf;
-      pbuf_chain(ptr, p);
-    }
+//    if (mRxBuf == nullptr) {
+//      mRxBuf = p;
+//
+//      // Send back received data.
+//      send(tpcb);
+//    } else {
+//      // Chain pbufs to the end of what we recv'ed previously.
+//      struct pbuf* ptr = mRxBuf;
+//      pbuf_chain(ptr, p);
+//    }
+    tcp_recved(tpcb, p->len);
     ret_err = ERR_OK;
   } else if(mState == State::Closing) {
     // Odd case, remote side closing twice, trash data.
     tcp_recved(tpcb, p->tot_len);
-    mBuf = nullptr;
+    mRxBuf = nullptr;
     pbuf_free(p);
     ret_err = ERR_OK;
   } else {
     // Unknown mState, trash data.
     tcp_recved(tpcb, p->tot_len);
-    mBuf = nullptr;
+    mRxBuf = nullptr;
     pbuf_free(p);
     ret_err = ERR_OK;
   }
@@ -133,17 +143,20 @@ err_t TcpSocket::cb_recv(struct tcp_pcb* tpcb, struct pbuf* p, err_t err) {
 
 void TcpSocket::cb_error(err_t err) {
   LWIP_UNUSED_ARG(err);
+  mState = State::Closing;
+  mSocketPcb = nullptr;
+  mRxBuf = nullptr;
 }
 
 err_t TcpSocket::cb_poll(struct tcp_pcb* tpcb) {
-  if (mBuf) {
-    tcp_sent(tpcb, _sent);
-    /* there is a remaining pbuf (chain) , try to send data */
-    send(tpcb);
-  } else if (mState == State::Closing) {
-    /* no remaining pbuf (chain)  */
-    close(tpcb);
-  }
+  //if (mBuf) {
+  //  tcp_sent(tpcb, _sent);
+  //  /* there is a remaining pbuf (chain) , try to send data */
+  //  send(tpcb);
+  //} else if (mState == State::Closing) {
+  //  /* no remaining pbuf (chain)  */
+  //  close();
+  //}
   return ERR_OK;
 }
 
@@ -152,13 +165,13 @@ err_t TcpSocket::cb_sent(struct tcp_pcb* tpcb, u16_t len) {
 
   mRetries = 0;
 
-  if (mBuf) {
+  /*if (mBuf) {
     // Still got pbufs to send.
     tcp_sent(tpcb, _sent);
     send(tpcb);
-  } else if (mState == State::Closing) {
+  } else*/ if (mState == State::Closing) {
     // If no more data to send and client closed connection.
-    close(tpcb);
+    close();
   }
   return ERR_OK;
 }
@@ -168,12 +181,12 @@ void TcpSocket::send(struct tcp_pcb* tpcb) {
   err_t wr_err = ERR_OK;
 
   while ((wr_err == ERR_OK) &&
-         (mBuf != NULL) &&
-         (mBuf->len <= tcp_sndbuf(tpcb)))
+         (mRxBuf != NULL) &&
+         (mRxBuf->len <= tcp_sndbuf(tpcb)))
   {
 
     /* get pointer on pbuf from es structure */
-    ptr = mBuf;
+    ptr = mRxBuf;
 
     /* enqueue data for transmission */
     wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);
@@ -186,12 +199,12 @@ void TcpSocket::send(struct tcp_pcb* tpcb) {
       plen = ptr->len;
 
       /* continue with next pbuf in chain (if any) */
-      mBuf = ptr->next;
+      mRxBuf = ptr->next;
 
-      if(mBuf != NULL)
+      if(mRxBuf != NULL)
       {
-        /* increment reference count for mBuf */
-        pbuf_ref(mBuf);
+        /* increment reference count for mRxBuf */
+        pbuf_ref(mRxBuf);
       }
 
      /* chop first pbuf from chain */
@@ -207,7 +220,7 @@ void TcpSocket::send(struct tcp_pcb* tpcb) {
    else if(wr_err == ERR_MEM)
    {
       /* we are low on memory, try later / harder, defer to poll */
-     mBuf = ptr;
+     mRxBuf = ptr;
    }
    else
    {
@@ -216,14 +229,14 @@ void TcpSocket::send(struct tcp_pcb* tpcb) {
   }
 }
 
-void TcpSocket::close(struct tcp_pcb* tpcb) {
-  // Remove all callbacks.
-  tcp_arg(tpcb, NULL);
-  tcp_sent(tpcb, NULL);
-  tcp_recv(tpcb, NULL);
-  tcp_err(tpcb, NULL);
-  tcp_poll(tpcb, NULL, 0);
+void TcpSocket::close() {
+  if (mSocketPcb) {
+    tcp_recv(mSocketPcb, nullptr);
+    tcp_err(mSocketPcb, nullptr);
+    tcp_poll(mSocketPcb, nullptr, 0);
+    tcp_close(mSocketPcb);
+    mSocketPcb = nullptr;
+  }
 
-  // close tcp connection.
-  tcp_close(tpcb);
+  mState = State::Closing;
 }
