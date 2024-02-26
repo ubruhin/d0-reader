@@ -10,6 +10,7 @@
 #include "lwip/netif.h"
 #include "lwip/sockets.h"
 #include "lwip/timeouts.h"
+#include "lwip/tcpip.h"
 #include "netif/ethernet.h"
 #include "stm32f1xx_hal.h"
 #include <cassert>
@@ -66,10 +67,72 @@ extern "C" void SystemInit(void) {
   while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08);
 }
 
-static void tcpTask(void* params) {
+static volatile bool tcpInitDone = false;
+static void tcpInitDoneCallback(void* arg) {
+  UNUSED(arg);
+  tcpInitDone = true;
+}
+
+static void mainTask(void* params) {
+    UNUSED(params);
+
+  // Configure priority grouping for FreeRTOS.
+  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+  // Enable peripheral clocks.
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_AFIO_CLK_ENABLE();
+
+  // Initialize general purpose I/Os.
+  //Gpio led = Gpio::outputPushPull(GPIOB, 14U, false);
+
+  // Initialize UART.
+  __HAL_RCC_USART3_CLK_ENABLE();
+  __HAL_AFIO_REMAP_USART3_PARTIAL();
+  Gpio::alternatePushPull(GPIOC, 10U, true);
+  Gpio::inputFloating(GPIOC, 11U);
+  Uart uart(USART3, USART3_IRQn, SystemCoreClock);
+  uart.setBaudrate(19200U);
+  uart.enable();
+
+  // Initialize Ethernet hardware.
+  Gpio::alternatePushPull(GPIOA, 2U);  // RMII_MDIO
+  Gpio::alternatePushPull(GPIOB, 11U);  // RMII_TXEN
+  Gpio::alternatePushPull(GPIOB, 12U);  // RMII_TXD0
+  Gpio::alternatePushPull(GPIOB, 13U);  // RMII_TXD1
+  Gpio::alternatePushPull(GPIOC, 1U);  // RMII_MDC
+  Gpio::inputFloating(GPIOA, 1U);  // RMII_REFCLK
+  Gpio::inputFloating(GPIOA, 7U);  // RMII_CRS_DV
+  Gpio::inputFloating(GPIOC, 4U);  // RMII_RXD0
+  Gpio::inputFloating(GPIOC, 5U);  // RMII_RXD1
+  __HAL_AFIO_ETH_RMII();
+  __HAL_RCC_ETHMAC_CLK_ENABLE();
+  __HAL_RCC_ETHMACTX_CLK_ENABLE();
+  __HAL_RCC_ETHMACRX_CLK_ENABLE();
+
+  tcpip_init(NULL, NULL);
+
+  //while(!tcpInitDone) {
+  //  vTaskDelay(1);
+  //}
+
+  // Initialize TCP/IP stack.
+  struct netif gnetif;
+  netif_add_noaddr(&gnetif, NULL, &ethernetif_init, &ethernet_input);
+  netif_set_default(&gnetif);
+  netif_set_link_callback(&gnetif, ethernetif_update_config);
+
+  // Setup mDNS responses.
+  mdns_resp_init();
+  mdns_resp_add_netif(&gnetif, gnetif.hostname);
+  mdns_resp_add_service(&gnetif, "SmartMeter", "_smartmeter", DNSSD_PROTO_TCP, 80, NULL, NULL);
+
+  // Start application.
   Gpio led = Gpio::outputPushPull(GPIOB, 14U, true);
 
-  char rec_buffer[10];
+  /*char rec_buffer[10];
 	char* rec_data;
 	uint8_t rec_size;
 	uint8_t client_disconnect = 1;
@@ -115,65 +178,8 @@ static void tcpTask(void* params) {
     }
     vTaskDelay(300);
 
-	}
-}
+	}*/
 
-static void mainTask(void* params) {
-    UNUSED(params);
-
-  // Configure priority grouping for FreeRTOS.
-  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-
-  // Enable peripheral clocks.
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_AFIO_CLK_ENABLE();
-
-  // Initialize general purpose I/Os.
-  //Gpio led = Gpio::outputPushPull(GPIOB, 14U, false);
-
-  // Initialize UART.
-  __HAL_RCC_USART3_CLK_ENABLE();
-  __HAL_AFIO_REMAP_USART3_PARTIAL();
-  Gpio::alternatePushPull(GPIOC, 10U, true);
-  Gpio::inputFloating(GPIOC, 11U);
-  Uart uart(USART3, USART3_IRQn, SystemCoreClock);
-  uart.setBaudrate(19200U);
-  uart.enable();
-
-  // Initialize Ethernet hardware.
-  Gpio::alternatePushPull(GPIOA, 2U);  // RMII_MDIO
-  Gpio::alternatePushPull(GPIOB, 11U);  // RMII_TXEN
-  Gpio::alternatePushPull(GPIOB, 12U);  // RMII_TXD0
-  Gpio::alternatePushPull(GPIOB, 13U);  // RMII_TXD1
-  Gpio::alternatePushPull(GPIOC, 1U);  // RMII_MDC
-  Gpio::inputFloating(GPIOA, 1U);  // RMII_REFCLK
-  Gpio::inputFloating(GPIOA, 7U);  // RMII_CRS_DV
-  Gpio::inputFloating(GPIOC, 4U);  // RMII_RXD0
-  Gpio::inputFloating(GPIOC, 5U);  // RMII_RXD1
-  __HAL_AFIO_ETH_RMII();
-  __HAL_RCC_ETHMAC_CLK_ENABLE();
-  __HAL_RCC_ETHMACTX_CLK_ENABLE();
-  __HAL_RCC_ETHMACRX_CLK_ENABLE();
-
-  // Initialize TCP/IP stack.
-  struct netif gnetif;
-  lwip_init();
-  netif_add_noaddr(&gnetif, NULL, &ethernetif_init, &ethernet_input);
-  netif_set_default(&gnetif);
-  netif_set_link_callback(&gnetif, ethernetif_update_config);
-
-  // Setup mDNS responses.
-  mdns_resp_init();
-  mdns_resp_add_netif(&gnetif, gnetif.hostname);
-  mdns_resp_add_service(&gnetif, "SmartMeter", "_smartmeter", DNSSD_PROTO_TCP, 80, NULL, NULL);
-
-  // Start application.
-
-  TaskHandle_t tcpTaskHandle;
-  xTaskCreate(tcpTask, "tcpTask", 512, NULL, 1, &tcpTaskHandle);
-  assert(tcpTaskHandle);
 
   uint32_t dhcpFineTimer = 0;
   while (1) {
@@ -190,6 +196,7 @@ static void mainTask(void* params) {
       dhcpFineTimer = HAL_GetTick();
       ethernetif_update_link_status(&gnetif);
       DHCP_Process(&gnetif);
+      led.toggle();
 
       //const char* msg = "Hello world!\n";
       //socket.write((const uint8_t*)msg, strlen(msg));

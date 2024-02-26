@@ -44,6 +44,11 @@
 // AUTOIP
 #define LWIP_AUTOIP                 1
 
+// TCP/IP
+#define TCPIP_MBOX_SIZE             6
+#define TCPIP_THREAD_STACKSIZE      512
+#define TCPIP_THREAD_PRIO           1
+
 // Various
 #define LWIP_STATS                  0
 #define LWIP_SINGLE_NETIF           1
@@ -51,6 +56,8 @@
 #define LWIP_NUM_NETIF_CLIENT_DATA  3
 #define LWIP_MULTICAST_TX_OPTIONS   1
 #define LWIP_NETIF_LINK_CALLBACK    1
+#define DEFAULT_TCP_RECVMBOX_SIZE   6
+#define DEFAULT_ACCEPTMBOX_SIZE     6
 
 // APIs
 #define LWIP_NETCONN                1
