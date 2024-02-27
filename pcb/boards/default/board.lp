@@ -4635,7 +4635,7 @@
  (stroke_text 9280ca2b-c0a6-45a2-8395-02f0e5c88bd6 (layer brd_comments)
   (height 1.5) (stroke_width 0.2) (letter_spacing auto) (line_spacing auto)
   (align left top) (position 23.97125 16.589375) (rotation 0.0)
-  (auto_rotate true) (mirror false) (lock false) (value "Issues:\n- Optical center of phototransistor has offset\n- Ethernet connector fits very thight\n- Parts close around optical devices conflict with enclosure\n- Bad readability of silkscreen text due to vias\n- Optical path only works with 45° rotation\n- Connect SWO line?")
+  (auto_rotate true) (mirror false) (lock false) (value "Issues:\n- Optical center of phototransistor has offset\n- Ethernet connector fits very thight\n- Parts close around optical devices conflict with enclosure\n- Bad readability of silkscreen text due to vias\n- Optical path only works with 45° rotation\n- Connect SWO line?\n- Support injecting supply voltage for development?")
  )
  (stroke_text a112dfb1-b67a-48ab-aaa1-0677da9568c4 (layer bot_legend)
   (height 1.1) (stroke_width 0.2) (letter_spacing auto) (line_spacing auto)

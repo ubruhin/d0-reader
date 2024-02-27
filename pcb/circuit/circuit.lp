@@ -217,7 +217,7 @@
   (lock_assembly false)
   (device 86feb434-345b-4f9f-b9dd-98b739c4dac1
    (variant 62381a67-292d-448e-952b-bea07d640ac0)
-   (part "TEMT1020" (manufacturer "VIshay")
+   (part "TEMT1020" (manufacturer "Vishay")
    )
   )
   (signal 39071d2a-a637-4b40-98b5-5b5cc3eba0b6 (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4))
