@@ -107,6 +107,17 @@
    (align center top) (height 2.54) (position 218.44 76.2) (rotation 270.0)
   )
  )
+ (symbol 20a64456-e193-4b5f-bc10-ac10c5a3f76a
+  (component 60abe5e8-0c3b-4cda-9f1f-cedce8c36cb3)
+  (lib_gate 6d0139ee-8f57-4b0e-ba3a-3bba6d344084)
+  (position 124.46 68.58) (rotation 0.0) (mirror false)
+  (text 4cd3598d-1a1b-423d-b308-46d5f01fb9cb (layer sym_values) (value "{{VALUE}}")
+   (align left top) (height 2.54) (position 116.84 60.96) (rotation 0.0)
+  )
+  (text b5ec7d99-a6e1-4d8c-ae85-624dd4095549 (layer sym_names) (value "{{NAME}}")
+   (align left bottom) (height 2.54) (position 116.84 76.2) (rotation 0.0)
+  )
+ )
  (symbol 213d9a60-ec86-49ca-8d68-d7c154240f3d
   (component 012ad46b-d2fe-45e3-bd71-c9efe2b64f8f)
   (lib_gate 42989503-2795-4892-9d83-b919cd7dad76)

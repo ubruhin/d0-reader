@@ -484,6 +484,22 @@
   (signal 3452d36e-1ce8-4b7c-8e5b-90c2e4929ed8 (net a1e36bea-3602-4afa-a9b3-34da7d4898af))
   (signal ad623f98-9e73-49c3-9404-f7cfa99d17cd (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4))
  )
+ (component 60abe5e8-0c3b-4cda-9f1f-cedce8c36cb3
+  (lib_component c171cc73-2310-4d3b-b4b7-03ff75b16d3d)
+  (lib_variant 770d4d5d-1625-4443-b6f1-1decfc52b3d4)
+  (name "J3") (value "{{ MPN or DEVICE }}")
+  (lock_assembly false)
+  (device 09214b77-dd18-43c2-ade6-92e293c19fb2
+   (variant 62381a67-292d-448e-952b-bea07d640ac0)
+   (part "UJC-HP-3-SMT-TR" (manufacturer "CUI Devices")
+   )
+  )
+  (signal 0148eb05-e599-4187-9e16-4f8446d46e18 (net none))
+  (signal 14f91f62-0398-4413-aae0-3cfdecf0fda7 (net none))
+  (signal 3fa1bf37-f857-4992-9903-7cfb0a74f864 (net none))
+  (signal 41617ae9-3b5d-4379-9676-789174469b98 (net none))
+  (signal a41c894e-0d61-4fa5-a141-9d92c4e6c339 (net none))
+ )
  (component 61752d95-391e-4bab-804c-c2d0802c5de1
   (lib_component 2c5d2ae0-a3db-45cc-b04b-8ba114d1c9ce)
   (lib_variant abc3057c-8bb0-487b-bde6-38ab1f14057d)
