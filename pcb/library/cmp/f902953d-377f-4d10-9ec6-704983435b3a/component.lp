@@ -42,7 +42,7 @@
   (required false) (negated false) (clock false) (forced_net "")
  )
  (signal 211bc315-c410-4419-a546-5e777172e204 (name "VDD_SDIO") (role passive)
-  (required true) (negated false) (clock false) (forced_net "")
+  (required false) (negated false) (clock false) (forced_net "")
  )
  (signal 87ce95d5-c0dd-459b-9bc6-e2bdfe5aa827 (name "IO33/32K_XN") (role passive)
   (required false) (negated false) (clock false) (forced_net "")
