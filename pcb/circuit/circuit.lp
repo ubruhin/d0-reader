@@ -439,7 +439,6 @@
   (name "J2") (value "SWD")
   (lock_assembly false)
   (device 7f909383-6ffb-48ce-b340-e60d31396a2f
-   (variant 62381a67-292d-448e-952b-bea07d640ac0)
    (part "4048" (manufacturer "Adafruit")
    )
   )
