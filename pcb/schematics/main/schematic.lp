@@ -174,7 +174,7 @@
    (align left center) (height 3.5) (position 227.0 2.5) (rotation 0.0)
   )
   (text 96e63648-7840-4715-8459-8a99412f14e7 (layer sym_outlines) (value "{{FIELD_AUTHOR}}")
-   (align left center) (height 3.5) (position 247.0 7.5) (rotation 0.0)
+   (align left center) (height 3.4) (position 247.0 7.5) (rotation 0.0)
   )
   (text ab2d1999-564c-4dae-883c-1258bc1bbfff (layer sym_outlines) (value "{{FIELD_SHEET}}")
    (align left center) (height 7.5) (position 162.0 10.0) (rotation 0.0)
