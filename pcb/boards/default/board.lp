@@ -553,7 +553,7 @@
  (device b1453689-0d9f-4797-b2e9-44db3643ce0b
   (lib_device 8ee2e80d-6636-4196-b135-2e8121eb7edd)
   (lib_footprint 7edc5b12-1da9-478c-a5bd-1fc2e3b05198)
-  (lib_3d_model 7a5f92ff-df2b-4ec3-822a-ca47b73245ef)
+  (lib_3d_model none)
   (position -12.544703 8.89) (rotation 0.0) (flip false) (lock false)
   (stroke_text 689f101f-b007-45a6-a02e-f548dd900010 (layer top_names)
    (height 0.8) (stroke_width 0.15) (letter_spacing auto) (line_spacing auto)
@@ -3352,7 +3352,7 @@
  (netsegment e3cfefc7-f205-4bf9-8d2e-4adeff528502
   (net 3a4b85da-e763-4c91-8568-31b18ac3bfb4)
   (via 54536982-b1f7-41df-a718-95515c6f1d6a (from top_cu) (to bot_cu)
-   (position -16.748125 -0.396875) (size 0.7) (drill 0.3) (exposure off)
+   (position -16.748125 -0.555625) (size 0.7) (drill 0.3) (exposure off)
   )
  )
  (netsegment e65ab23c-3847-47f4-b64a-7aba80f904d3
