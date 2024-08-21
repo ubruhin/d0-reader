@@ -1,0 +1,15 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.adapterTargetName": "esp32c6",
+    "idf.customExtraPaths": "${config:idf.toolsPath}/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin:${config:idf.toolsPath}/tools/riscv32-esp-elf-gdb/14.2_20240403/riscv32-esp-elf-gdb/bin:${config:idf.toolsPath}/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin:${config:idf.toolsPath}/tools/riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/bin:${config:idf.toolsPath}/tools/esp32ulp-elf/2.35_20220830/esp32ulp-elf/bin:${config:idf.toolsPath}/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin:${config:idf.toolsPath}/tools/esp-rom-elfs/20230320",
+    "idf.customExtraVars": {
+        "OPENOCD_SCRIPTS": "${config:idf.toolsPath}/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
+        "ESP_ROM_ELF_DIR": "${config:idf.toolsPath}/tools/esp-rom-elfs/20230320/"
+    },
+    "idf.openOcdConfigs": [
+        "board/esp32c6-builtin.cfg"
+    ],
+    "idf.port": "/dev/ttyACM0",
+    "idf.pythonBinPath": "${config:idf.toolsPath}/python_env/idf5.2_py3.10_env/bin/python",
+    "idf.flashType": "JTAG"
+}

@@ -1,0 +1,10 @@
+# https://docs.espressif.com/projects/esp-idf/en/latest/esp32c6/api-guides/partition-tables.html
+# Name,   Type, SubType, Offset,   Size,      Flags
+# builtin: bootloader                               # 32K
+# builtin: parition table                           # 4K
+nvs,      data, nvs,     0x9000,   0x6000,    ,     # 24K
+storage,  data, spiffs,  0xF000,   0x8000,    ,     # 32K
+# reserve                                           # 28K
+otadata,  data, ota,     0x1E000,  0x2000,    ,     # 8K
+ota_0,    app,  ota_0,   0x20000,  0x1F0000,  ,     # 1984K
+ota_1,    app,  ota_1,   0x210000, 0x1F0000,  ,     # 1984K
