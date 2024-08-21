@@ -8,12 +8,14 @@
       "windows": {
         "command": "${config:idf.pythonBinPathWin} ${config:idf.espIdfPathWin}\\tools\\idf.py build",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}"
           }
         }
       },
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}"
         }
@@ -44,6 +46,9 @@
       "label": "Set ESP-IDF Target",
       "type": "shell",
       "command": "${command:espIdf.setTarget}",
+      "options": {
+        "cwd": "${workspaceFolder}/firmware",
+      },
       "problemMatcher": {
         "owner": "cpp",
         "fileLocation": [
@@ -67,12 +72,14 @@
       "windows": {
         "command": "${config:idf.pythonBinPathWin} ${config:idf.espIdfPathWin}\\tools\\idf.py fullclean",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}"
           }
         }
       },
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}"
         }
@@ -102,12 +109,14 @@
       "windows": {
         "command": "${config:idf.pythonBinPathWin} ${config:idf.espIdfPathWin}\\tools\\idf.py flash -p ${config:idf.portWin} -b ${config:idf.flashBaudRate}",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}"
           }
         }
       },
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}"
         }
@@ -137,12 +146,14 @@
       "windows": {
         "command": "${config:idf.pythonBinPathWin} ${config:idf.espIdfPathWin}\\tools\\idf.py -p ${config:idf.portWin} monitor",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}"
           }
         }
       },
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}"
         }
@@ -179,12 +190,14 @@
       "windows": {
         "command": "openocd.exe -s ${command:espIdf.getOpenOcdScriptValue} ${command:espIdf.getOpenOcdConfigs}",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}"
           }
         }
       },
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}"
         }
@@ -211,6 +224,7 @@
       "command": "${config:idf.pythonBinPath}",
       "isBackground": true,
       "options": {
+        "cwd": "${workspaceFolder}/firmware",
         "env": {
           "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
           "PYTHONPATH": "${command:espIdf.getExtensionPath}/esp_debug_adapter/debug_adapter"
@@ -248,6 +262,7 @@
       "windows": {
         "command": "${config:idf.pythonBinPathWin}",
         "options": {
+          "cwd": "${workspaceFolder}/firmware",
           "env": {
             "PATH": "${env:PATH};${config:idf.customExtraPaths}",
             "PYTHONPATH": "${command:espIdf.getExtensionPath}/esp_debug_adapter/debug_adapter"

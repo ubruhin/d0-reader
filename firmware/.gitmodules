@@ -1,6 +1,0 @@
-[submodule "components/ArduinoJson"]
-	path = components/ArduinoJson
-	url = https://github.com/bblanchon/ArduinoJson
-[submodule "components/MicroOcpp"]
-	path = components/MicroOcpp
-	url = https://github.com/matth-x/MicroOcpp

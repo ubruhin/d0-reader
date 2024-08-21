@@ -2,9 +2,7 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.16)
 
-set(EXTRA_COMPONENT_DIRS static)
-
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(sintio-plug-firmware)
+project(nuoreader-firmware)
 
 option(BUILD_STRICT "Threat all warnings as errors." OFF)

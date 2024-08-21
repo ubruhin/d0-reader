@@ -12,5 +12,5 @@ jobs:
       with:
         esp_idf_version: v5.2.2
         target: esp32c6
-        path: '.'
+        path: 'firmware'
         command: idf.py build -DBUILD_STRICT=1

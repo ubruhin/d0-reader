@@ -1,3 +1,0 @@
-dependencies:
-  espressif/esp_websocket_client: "^1.2.3"
-  espressif/led_strip: "^2.4.1"
