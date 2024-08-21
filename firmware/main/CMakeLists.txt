@@ -1,5 +1,7 @@
 idf_component_register(
     SRCS
+    "DigitalIn.cpp"
+    "DigitalOut.cpp"
     "main.cpp"
     INCLUDE_DIRS "."
 )
