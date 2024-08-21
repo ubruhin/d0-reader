@@ -3,6 +3,7 @@ idf_component_register(
     "DigitalIn.cpp"
     "DigitalOut.cpp"
     "main.cpp"
+    "Uart.cpp"
     INCLUDE_DIRS "."
 )
 

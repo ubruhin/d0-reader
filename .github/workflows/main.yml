@@ -11,6 +11,6 @@ jobs:
       uses: espressif/esp-idf-ci-action@v1
       with:
         esp_idf_version: v5.2.2
-        target: esp32c6
+        target: esp32
         path: 'firmware'
         command: idf.py build -DBUILD_STRICT=1

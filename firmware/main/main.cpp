@@ -1,5 +1,6 @@
 #include "DigitalIn.h"
 #include "DigitalOut.h"
+#include "Uart.h"
 
 #include <esp_eth.h>
 #include <esp_event.h>
@@ -63,6 +64,8 @@ extern "C" void app_main(void) {
   DigitalOut testPoint1(GPIO_NUM_8);
 
   DigitalIn button(GPIO_NUM_38);
+
+  Uart irUart(UART_NUM_1, 39, 5);
 
   eth_esp32_emac_config_t cfgEmac = ETH_ESP32_EMAC_DEFAULT_CONFIG();
   cfgEmac.smi_mdc_gpio_num = GPIO_NUM_32;
